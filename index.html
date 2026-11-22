@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e78db4">
+  <meta name="description" content="Tasky adalah pengingat tugas sekolah yang praktis dan bisa digunakan secara offline.">
+
+  <title>Tasky - Pengingat Tugas Sekolah</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">♡</div>
+      <div>
+        <h1>Tasky</h1>
+        <p>Pengingat Tugas Sekolah</p>
+      </div>
+    </div>
+    <span class="offline-label" id="connectionStatus">● Online</span>
+  </header>
+
+  <main class="container">
+
+    <!-- BERANDA -->
+    <section id="beranda" class="page active">
+      <div class="welcome">
+        <p class="date-label" id="todayDate"></p>
+        <h2>Halo, <span id="greetingName">Pelajar</span>! 👋</h2>
+        <p>Yuk, selesaikan tugasmu hari ini!</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span>📚 Total Tugas</span>
+          <strong id="totalTasks">0</strong>
+        </div>
+        <div class="stat-card">
+          <span>✅ Selesai</span>
+          <strong id="completedTasks">0</strong>
+        </div>
+        <div class="stat-card">
+          <span>⏳ Belum Selesai</span>
+          <strong id="pendingTasks">0</strong>
+        </div>
+        <div class="stat-card">
+          <span>⚠️ Terlambat</span>
+          <strong id="overdueTasks">0</strong>
+        </div>
+      </div>
+
+      <div class="progress-card">
+        <div class="section-heading">
+          <h3>Progress Tugas</h3>
+          <strong id="progressText">0%</strong>
+        </div>
+        <div class="progress-track">
+          <div id="progressBar" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="section-heading">
+        <h3>Deadline Terdekat</h3>
+        <button class="text-button" data-go="tugas">Lihat semua</button>
+      </div>
+
+      <div id="upcomingTasks" class="task-list"></div>
+    </section>
+
+    <!-- KALENDER -->
+    <section id="kalender" class="page">
+      <div class="page-heading">
+        <h2>Kalender 📅</h2>
+        <p>Atur jadwal pengumpulan tugasmu.</p>
+      </div>
+
+      <div class="calendar-card">
+        <div class="calendar-header">
+          <button id="prevMonth" aria-label="Bulan sebelumnya">‹</button>
+          <h3 id="monthTitle"></h3>
+          <button id="nextMonth" aria-label="Bulan berikutnya">›</button>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+
+      <h3 class="section-title">Tugas pada tanggal terpilih</h3>
+      <div id="selectedDateTasks" class="task-list"></div>
+    </section>
+
+    <!-- TAMBAH TUGAS -->
+    <section id="tambah" class="page">
+      <div class="page-heading">
+        <h2 id="formTitle">Tambah Tugas ✏️</h2>
+        <p>Catat tugasmu agar tidak lupa deadline.</p>
+      </div>
+
+      <form id="taskForm" class="form-card">
+        <input type="hidden" id="taskId">
+
+        <label for="taskName">Nama Tugas</label>
+        <input id="taskName" type="text"
+          placeholder="Contoh: Latihan matriks" required maxlength="100">
+
+        <label for="taskSubject">Mata Pelajaran</label>
+        <div class="subject-row">
+          <select id="taskSubject" required>
+            <option value="">Pilih mata pelajaran</option>
+          </select>
+          <button type="button" id="addSubject" class="secondary-button">+ Baru</button>
+        </div>
+
+        <label for="taskDescription">Deskripsi Tugas</label>
+        <textarea id="taskDescription"
+          placeholder="Tambahkan keterangan tugas..."></textarea>
+
+        <label for="assignedDate">Tanggal Diberikan</label>
+        <input id="assignedDate" type="date">
+
+        <div class="form-row">
+          <div>
+            <label for="deadlineDate">Tanggal Deadline</label>
+            <input id="deadlineDate" type="date" required>
+          </div>
+          <div>
+            <label for="deadlineTime">Jam Deadline</label>
+            <input id="deadlineTime" type="time" required>
+          </div>
+        </div>
+
+        <label for="taskPriority">Prioritas</label>
+        <select id="taskPriority">
+          <option value="rendah">Rendah</option>
+          <option value="sedang" selected>Sedang</option>
+          <option value="tinggi">Tinggi</option>
+        </select>
+
+        <div class="button-row">
+          <button type="submit" class="primary-button" id="saveTaskButton">
+            Simpan Tugas
+          </button>
+          <button type="button" class="secondary-button" id="cancelEdit" hidden>
+            Batal
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- DAFTAR TUGAS -->
+    <section id="tugas" class="page">
+      <div class="page-heading">
+        <h2>Daftar Tugas 📖</h2>
+        <p>Semua tugas sekolahmu ada di sini.</p>
+      </div>
+
+      <input type="search" id="searchTask"
+        placeholder="🔍 Cari nama tugas atau mata pelajaran...">
+
+      <div class="filter-row">
+        <select id="filterStatus">
+          <option value="semua">Semua status</option>
+          <option value="belum">Belum selesai</option>
+          <option value="selesai">Selesai</option>
+          <option value="terlambat">Terlambat</option>
+        </select>
+
+        <select id="filterPriority">
+          <option value="semua">Semua prioritas</option>
+          <option value="tinggi">Tinggi</option>
+          <option value="sedang">Sedang</option>
+          <option value="rendah">Rendah</option>
+        </select>
+      </div>
+
+      <div id="allTasks" class="task-list"></div>
+    </section>
+
+    <!-- PENGATURAN -->
+    <section id="pengaturan" class="page">
+      <div class="page-heading">
+        <h2>Pengaturan ⚙️</h2>
+        <p>Atur Tasky sesuai kebutuhanmu.</p>
+      </div>
+
+      <div class="form-card">
+        <h3>Profil Pengguna</h3>
+        <label for="userName">Nama Panggilan</label>
+        <input id="userName" type="text" placeholder="Masukkan namamu" maxlength="30">
+        <button id="saveName" class="primary-button">Simpan Nama</button>
+      </div>
+
+      <div class="form-card">
+        <h3>Cadangkan Data</h3>
+        <p>Unduh semua tugasmu sebagai file JSON.</p>
+        <button id="exportData" class="primary-button">Unduh Backup</button>
+      </div>
+
+      <div class="form-card">
+        <h3>Pulihkan Data</h3>
+        <p>Masukkan kembali data dari file backup.</p>
+        <input type="file" id="importFile" accept=".json,application/json">
+        <button id="importData" class="secondary-button">Pulihkan Data</button>
+      </div>
+
+      <div class="form-card">
+        <h3>Informasi Tasky</h3>
+        <p>Tasky versi 1.0</p>
+        <p>Dibuat untuk membantu siswa mengatur tugas sekolah.</p>
+        <p>Data disimpan secara lokal di perangkatmu.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- NAVIGASI BAWAH -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-page="beranda">
+      <span>⌂</span><small>Beranda</small>
+    </button>
+    <button class="nav-item" data-page="kalender">
+      <span>▦</span><small>Kalender</small>
+    </button>
+    <button class="nav-item add-nav" data-page="tambah">
+      <span>＋</span><small>Tambah</small>
+    </button>
+    <button class="nav-item" data-page="tugas">
+      <span>☷</span><small>Tugas</small>
+    </button>
+    <button class="nav-item" data-page="pengaturan">
+      <span>⚙</span><small>Pengaturan</small>
+    </button>
+  </nav>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
